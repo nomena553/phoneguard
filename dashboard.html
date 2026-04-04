@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhoneGuard Pro</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:#0a0c10;color:#f0f2f7;min-height:100vh}
+.nav{background:#111318;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #2a2f3a}
+.logo{font-size:18px;font-weight:bold;color:#fff}
+.logo span{color:#ff3b3b}
+.dot{width:8px;height:8px;background:#00d084;border-radius:50%;display:inline-block;margin-right:6px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.container{max-width:900px;margin:0 auto;padding:20px}
+.card{background:#111318;border:1px solid #2a2f3a;border-radius:12px;padding:18px;margin-bottom:16px}
+.card h3{font-size:13px;color:#8b91a0;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+.status-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:bold}
+.badge-red{background:rgba(255,59,59,.15);color:#ff3b3b;border:1px solid rgba(255,59,59,.3)}
+.badge-green{background:rgba(0,208,132,.15);color:#00d084;border:1px solid rgba(0,208,132,.3)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.stat{background:#1a1d24;border-radius:10px;padding:14px;text-align:center}
+.stat .num{font-size:28px;font-weight:bold;font-family:monospace}
+.stat .lbl{font-size:11px;color:#8b91a0;margin-top:4px}
+.btn{width:100%;padding:14px;border:none;border-radius:10px;font-size:14px;font-weight:bold;cursor:pointer;margin-bottom:10px;transition:opacity .2s}
+.btn:hover{opacity:.85}
+.btn-red{background:#ff3b3b;color:#fff}
+.btn-green{background:#00d084;color:#000}
+.btn-orange{background:#ff6b35;color:#fff}
+.btn-blue{background:#3d8bff;color:#fff}
+.btn-gray{background:#2a2f3a;color:#8b91a0}
+.map{background:#111827;border-radius:10px;height:220px;position:relative;overflow:hidden;margin-bottom:12px}
+.map-grid{position:absolute;inset:0;background-image:linear-gradient(#1e2530 1px,transparent 1px),linear-gradient(90deg,#1e2530 1px,transparent 1px);background-size:30px 30px}
+.map-dot{position:absolute;width:16px;height:16px;background:#ff3b3b;border-radius:50%;transform:translate(-50%,-50%);top:50%;left:50%}
+.map-dot::before{content:'';position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(255,59,59,.5);animation:ring 2s infinite}
+@keyframes ring{0%{transform:scale(.5);opacity:1}100%{transform:scale(2.5);opacity:0}}
+.map-info{position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,.75);border-radius:8px;padding:8px 12px;font-size:11px;font-family:monospace}
+.coords{color:#00d084;margin-top:3px}
+.event{background:#1a1d24;border-radius:8px;padding:10px 12px;margin-bottom:8px;border-left:3px solid #2a2f3a}
+.event.sim{border-color:#ff3b3b}
+.event.airplane{border-color:#ff6b35}
+.event.photo{border-color:#3d8bff}
+.event.locked{border-color:#ff3b3b}
+.event.unlocked{border-color:#00d084}
+.event-type{font-size:11px;font-weight:bold;color:#8b91a0;text-transform:uppercase}
+.event-msg{font-size:13px;margin-top:3px}
+.event-time{font-size:10px;color:#5a6070;margin-top:2px;font-family:monospace}
+.lock-screen-preview{background:#fff;border-radius:12px;padding:30px 20px;text-align:center;color:#111}
+.preview-icon{font-size:48px;margin-bottom:16px}
+.preview-msg{font-size:16px;font-weight:bold;line-height:1.5;margin-bottom:12px}
+.preview-line{width:40px;height:3px;background:#e53e3e;margin:0 auto 12px}
+.preview-sub{font-size:12px;color:#666}
+.msg-input{width:100%;background:#1a1d24;border:1px solid #2a2f3a;border-radius:8px;padding:12px;color:#fff;font-size:13px;margin-bottom:10px;resize:vertical;min-height:80px}
+.msg-input:focus{outline:none;border-color:#3d8bff}
+select{background:#1a1d24;border:1px solid #2a2f3a;border-radius:8px;padding:10px;color:#fff;font-size:13px;width:100%;margin-bottom:10px}
+select:focus{outline:none}
+.toast{position:fixed;bottom:20px;right:20px;background:#1a1d24;border:1px solid #2a2f3a;border-radius:10px;padding:12px 18px;font-size:13px;z-index:999;transform:translateY(80px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+.online{color:#00d084}
+.offline{color:#ff3b3b}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="logo">Phone<span>Guard</span> Pro</div>
+  <div style="font-size:12px"><span class="dot"></span><span id="srvStatus">Connecté</span></div>
+</nav>
+
+<div class="container">
+
+  <!-- SELECTEUR APPAREIL -->
+  <div class="card">
+    <h3>Appareil sélectionné</h3>
+    <select id="selDevice" onchange="loadDevice()">
+      <option value="PHONE_001">PHONE_001 — Telephone Principal</option>
+    </select>
+    <div class="status-row">
+      <span id="devName" style="font-weight:bold;font-size:15px">Telephone Principal</span>
+      <span id="devBadge" class="badge badge-green">EN LIGNE</span>
+    </div>
+    <div style="font-size:12px;color:#8b91a0" id="lastSeen">Derniere activite : —</div>
+  </div>
+
+  <!-- STATISTIQUES -->
+  <div class="grid3" style="margin-bottom:16px">
+    <div class="stat">
+      <div class="num" id="statLocked" style="color:#ff3b3b">NON</div>
+      <div class="lbl">BLOQUÉ</div>
+    </div>
+    <div class="stat">
+      <div class="num" id="statEvents" style="color:#ff6b35">0</div>
+      <div class="lbl">ALERTES</div>
+    </div>
+    <div class="stat">
+      <div class="num" id="statOnline" style="color:#00d084">•</div>
+      <div class="lbl">STATUT</div>
+    </div>
+  </div>
+
+  <!-- CARTE GPS -->
+  <div class="card">
+    <h3>Position GPS en temps réel</h3>
+    <div class="map">
+      <div class="map-grid"></div>
+      <div class="map-dot" id="mapDot"></div>
+      <div class="map-info">
+        <div>Position actuelle</div>
+        <div class="coords" id="coords">---, ---</div>
+        <div style="color:#5a6070;font-size:10px" id="gpsTime">En attente...</div>
+      </div>
+    </div>
+    <a id="gpsLink" href="#" target="_blank"
+       style="display:block;text-align:center;background:#1a1d24;border-radius:8px;padding:10px;color:#3d8bff;font-size:13px;text-decoration:none">
+      📍 Ouvrir dans Google Maps
+    </a>
+  </div>
+
+  <!-- COMMANDES -->
+  <div class="card">
+    <h3>Commandes à distance</h3>
+    <div class="grid2">
+      <div>
+        <button class="btn btn-red" onclick="sendCmd('lock')">🔒 BLOQUER</button>
+        <button class="btn btn-green" onclick="sendCmd('unlock')">🔓 DÉBLOQUER</button>
+      </div>
+      <div>
+        <button class="btn btn-orange" onclick="sendCmd('alarm')">🔊 ALARME SONORE</button>
+        <button class="btn btn-blue" onclick="sendCmd('photo')">📸 PHOTO VOLEUR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MESSAGE PERSONNALISE -->
+  <div class="card">
+    <h3>Message écran bloqué</h3>
+    <textarea class="msg-input" id="lockMsg">efa signale police
+Raha tsy averinao ity telephone ity
+satria misy GPS
+
+atsoy 0341391434 tompony</textarea>
+    <button class="btn btn-gray" onclick="updateMsg()">💾 METTRE A JOUR LE MESSAGE</button>
+    <div style="margin-top:12px">
+      <div style="font-size:11px;color:#8b91a0;margin-bottom:8px">Aperçu écran bloqué :</div>
+      <div class="lock-screen-preview">
+        <div class="preview-icon">🚨</div>
+        <div class="preview-msg" id="previewMsg">efa signale police</div>
+        <div class="preview-line"></div>
+        <div class="preview-sub">Ce telephone est signale vole</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALERTES -->
+  <div class="card">
+    <h3>Alertes récentes</h3>
+    <div id="eventsList">
+      <div style="color:#5a6070;font-size:13px;text-align:center;padding:20px">
+        En attente d'alertes...
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var DEVICE = "PHONE_001";
+var SERVER = window.location.origin;
+var toastTimer;
+
+function loadDevice() {
+    DEVICE = document.getElementById('selDevice').value;
+}
+
+// Rafraichir toutes les 3 secondes
+setInterval(refreshAll, 3000);
+refreshAll();
+
+function refreshAll() {
+    fetch(SERVER + '/api/status?device=' + DEVICE)
+        .then(function(r){ return r.json(); })
+        .then(function(dev) { renderDevice(dev); })
+        .catch(function(){ document.getElementById('srvStatus').textContent = 'Hors ligne'; });
+}
+
+function renderDevice(dev) {
+    document.getElementById('srvStatus').textContent = 'Connecté';
+
+    // Badge bloqué
+    var badge   = document.getElementById('devBadge');
+    var statLkd = document.getElementById('statLocked');
+    if (dev.locked) {
+        badge.className   = 'badge badge-red';
+        badge.textContent = 'BLOQUÉ';
+        statLkd.textContent = 'OUI';
+        statLkd.style.color = '#ff3b3b';
+    } else {
+        badge.className   = 'badge badge-green';
+        badge.textContent = 'EN LIGNE';
+        statLkd.textContent = 'NON';
+        statLkd.style.color = '#00d084';
+    }
+
+    // Stats
+    document.getElementById('statEvents').textContent = dev.events ? dev.events.length : 0;
+
+    // GPS
+    if (dev.lat && dev.lng) {
+        var lat = parseFloat(dev.lat).toFixed(4);
+        var lng = parseFloat(dev.lng).toFixed(4);
+        document.getElementById('coords').textContent = lat + ' S, ' + lng + ' E';
+        document.getElementById('gpsLink').href =
+            'https://www.google.com/maps?q=' + dev.lat + ',' + dev.lng;
+        document.getElementById('gpsTime').textContent =
+            'MAJ: ' + (dev.lastSeen ? new Date(dev.lastSeen).toLocaleTimeString() : '—');
+        // Bouger le point sur la carte (simple simulation)
+        var dot = document.getElementById('mapDot');
+        var x = 50 + (parseFloat(dev.lng) - 47.5) * 200;
+        var y = 50 - (parseFloat(dev.lat) + 18.9) * 200;
+        x = Math.max(5, Math.min(95, x));
+        y = Math.max(5, Math.min(95, y));
+        dot.style.left = x + '%';
+        dot.style.top  = y + '%';
+    }
+
+    // Derniere activite
+    if (dev.lastSeen) {
+        document.getElementById('lastSeen').textContent =
+            'Derniere activite : ' + new Date(dev.lastSeen).toLocaleString();
+    }
+
+    // Evenements
+    if (dev.events && dev.events.length > 0) {
+        var html = '';
+        for (var i = 0; i < Math.min(dev.events.length, 10); i++) {
+            var ev = dev.events[i];
+            var cls = ev.type || '';
+            var icon = '📡';
+            if (cls === 'locked')           icon = '🔒';
+            if (cls === 'unlocked')         icon = '🔓';
+            if (cls === 'auto_lock')        icon = '⚠️';
+            if (cls === 'photo_captured')   icon = '📸';
+            if (cls === 'alarm')            icon = '🔊';
+            html += '<div class="event ' + cls + '">' +
+                '<div class="event-type">' + icon + ' ' + (ev.type||'').toUpperCase() + '</div>' +
+                '<div class="event-msg">' + (ev.message||'') + '</div>' +
+                '<div class="event-time">' + (ev.time ? new Date(ev.time).toLocaleString() : '') + '</div>' +
+                '</div>';
+        }
+        document.getElementById('eventsList').innerHTML = html;
+    }
+}
+
+function sendCmd(cmd) {
+    var labels = {
+        lock:   '🔒 Blocage envoyé !',
+        unlock: '🔓 Déblocage envoyé !',
+        alarm:  '🔊 Alarme envoyée !',
+        photo:  '📸 Demande photo envoyée !'
+    };
+    fetch(SERVER + '/api/command', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device: DEVICE, command: cmd })
+    }).then(function(r){ return r.json(); })
+      .then(function(){ showToast(labels[cmd] || 'Commande envoyée'); refreshAll(); })
+      .catch(function(){ showToast('Erreur connexion serveur'); });
+}
+
+function updateMsg() {
+    var msg = document.getElementById('lockMsg').value;
+    document.getElementById('previewMsg').textContent = msg;
+    fetch(SERVER + '/api/command', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device: DEVICE, command: 'message', message: msg })
+    }).then(function(){ showToast('Message mis a jour !'); });
+}
+
+document.getElementById('lockMsg').addEventListener('input', function() {
+    document.getElementById('previewMsg').textContent = this.value;
+});
+
+function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+</script>
+</body>
+    </html>
