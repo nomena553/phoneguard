@@ -5,9 +5,7 @@ const url  = require('url');
 
 const PORT = process.env.PORT || 3000;
 
-// Base de donnees
-const db = {};
-// Stocker les photos separement
+const db     = {};
 const photos = {};
 
 function getDevice(id) {
@@ -16,8 +14,8 @@ function getDevice(id) {
             id:       id,
             locked:   false,
             command:  "",
-            lat:      -18.9106,
-            lng:      47.5322,
+            lat:      0,
+            lng:      0,
             lastSeen: null,
             events:   []
         };
@@ -55,8 +53,13 @@ const server = http.createServer(function(req, res) {
             try {
                 var data = JSON.parse(body);
                 var dev  = getDevice(data.device || 'unknown');
-                dev.lat      = data.lat;
-                dev.lng      = data.lng;
+                // Accepter seulement si position valide (pas 0,0)
+                var la = parseFloat(data.lat);
+                var lo = parseFloat(data.lng);
+                if (!isNaN(la) && !isNaN(lo) && la !== 0 && lo !== 0) {
+                    dev.lat = la;
+                    dev.lng = lo;
+                }
                 dev.lastSeen = new Date().toISOString();
             } catch(e) {}
             res.writeHead(200); res.end('OK');
@@ -70,11 +73,18 @@ const server = http.createServer(function(req, res) {
             try {
                 var data = JSON.parse(body);
                 var dev  = getDevice(data.device || 'unknown');
+                // Mettre a jour GPS si recu avec evenement
+                var la = parseFloat(data.lat);
+                var lo = parseFloat(data.lng);
+                if (!isNaN(la) && !isNaN(lo) && la !== 0 && lo !== 0) {
+                    dev.lat = la;
+                    dev.lng = lo;
+                }
                 dev.events.unshift({
                     type:    data.event,
                     message: data.message || data.event,
-                    lat:     data.lat || dev.lat,
-                    lng:     data.lng || dev.lng,
+                    lat:     dev.lat,
+                    lng:     dev.lng,
                     time:    new Date().toISOString()
                 });
                 if (dev.events.length > 50) dev.events.pop();
@@ -85,22 +95,19 @@ const server = http.createServer(function(req, res) {
         return;
     }
 
-    // POST /api/photo — recevoir photo en base64
+    // POST /api/photo
     if (req.method === 'POST' && route === '/api/photo') {
         readBody(req, function(body) {
             try {
-                var data = JSON.parse(body);
+                var data  = JSON.parse(body);
                 var devId = data.device || 'unknown';
-                var dev  = getDevice(devId);
-                // Stocker la photo
+                var dev   = getDevice(devId);
                 if (!photos[devId]) photos[devId] = [];
                 photos[devId].unshift({
                     data: data.photo,
                     time: new Date().toISOString()
                 });
-                // Garder seulement 10 photos
                 if (photos[devId].length > 10) photos[devId].pop();
-                // Ajouter evenement
                 dev.events.unshift({
                     type:    'photo_captured',
                     message: 'Photo du voleur recue',
@@ -113,7 +120,7 @@ const server = http.createServer(function(req, res) {
         return;
     }
 
-    // GET /api/photos?device=ID — recuperer les photos
+    // GET /api/photos
     if (req.method === 'GET' && route === '/api/photos') {
         var devPhotos = photos[query.device] || [];
         res.writeHead(200, {'Content-Type': 'application/json'});
