@@ -8,8 +8,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Arial,sans-serif;background:#0a0c10;color:#f0f2f7;min-height:100vh}
 .nav{background:#111318;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #2a2f3a;position:sticky;top:0;z-index:100}
-.logo{font-size:18px;font-weight:bold;color:#fff}
-.logo span{color:#ff3b3b}
+.logo{font-size:18px;font-weight:bold;color:#fff}.logo span{color:#ff3b3b}
 .dot{width:8px;height:8px;background:#00d084;border-radius:50%;display:inline-block;margin-right:6px;animation:pulse 2s infinite}
 .dot.off{background:#ff3b3b;animation:none}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
@@ -19,7 +18,7 @@ body{font-family:Arial,sans-serif;background:#0a0c10;color:#f0f2f7;min-height:10
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
 .stat{background:#1a1d24;border-radius:10px;padding:12px;text-align:center}
-.stat .num{font-size:24px;font-weight:bold;font-family:monospace}
+.stat .num{font-size:22px;font-weight:bold;font-family:monospace}
 .stat .lbl{font-size:10px;color:#8b91a0;margin-top:3px;text-transform:uppercase}
 .btn{width:100%;padding:13px;border:none;border-radius:10px;font-size:13px;font-weight:bold;cursor:pointer;margin-bottom:8px;transition:all .2s}
 .btn:active{transform:scale(.97)}
@@ -28,43 +27,38 @@ body{font-family:Arial,sans-serif;background:#0a0c10;color:#f0f2f7;min-height:10
 .btn-orange{background:#ff6b35;color:#fff}
 .btn-blue{background:#3d8bff;color:#fff}
 .btn-gray{background:#2a2f3a;color:#aaa;font-size:12px}
-/* CARTE */
-#mapFrame{width:100%;height:300px;border:none;border-radius:10px;background:#111827}
+#mapFrame{width:100%;height:280px;border:none;border-radius:10px;background:#111827}
 .map-bar{display:flex;gap:8px;margin-top:10px}
 .map-bar a{flex:1;text-align:center;background:#1a1d24;border-radius:8px;padding:9px;color:#3d8bff;font-size:12px;text-decoration:none;border:1px solid #2a2f3a}
 .gps-info{background:#1a1d24;border-radius:8px;padding:10px 14px;margin-bottom:10px;font-family:monospace;font-size:12px}
 .gps-coords{color:#00d084;font-size:14px;font-weight:bold;margin-bottom:3px}
 .gps-meta{color:#8b91a0;font-size:11px}
-/* ALERTES */
 .event{background:#1a1d24;border-radius:8px;padding:10px 12px;margin-bottom:7px;border-left:3px solid #2a2f3a}
 .event.locked{border-color:#ff3b3b}
 .event.unlocked{border-color:#00d084}
 .event.auto_lock{border-color:#ff6b35}
 .event.photo_captured{border-color:#3d8bff}
 .event.alarm{border-color:#ff6b35}
-.event-type{font-size:10px;font-weight:bold;color:#8b91a0;text-transform:uppercase;letter-spacing:.5px}
+.event-type{font-size:10px;font-weight:bold;color:#8b91a0;text-transform:uppercase}
 .event-msg{font-size:13px;margin-top:3px;color:#f0f2f7}
 .event-time{font-size:10px;color:#5a6070;margin-top:2px;font-family:monospace}
-/* MESSAGE */
-.msg-input{width:100%;background:#1a1d24;border:1px solid #2a2f3a;border-radius:8px;padding:10px;color:#fff;font-size:13px;margin-bottom:10px;resize:vertical;min-height:80px;font-family:Arial}
-.msg-input:focus{outline:none;border-color:#3d8bff}
-.preview-box{background:#fff;border-radius:10px;padding:24px 16px;text-align:center;color:#111;margin-top:10px}
-.preview-icon{font-size:40px;margin-bottom:12px}
-.preview-text{font-size:16px;font-weight:bold;line-height:1.6;margin-bottom:10px;white-space:pre-wrap}
-.preview-line{width:40px;height:3px;background:#e53e3e;margin:0 auto 10px}
-.preview-sub{font-size:11px;color:#666}
-/* BADGE */
-.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:bold;letter-spacing:.3px}
+/* PHOTOS */
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.photo-item{background:#1a1d24;border-radius:8px;overflow:hidden;aspect-ratio:1}
+.photo-item img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-time{font-size:9px;color:#8b91a0;text-align:center;padding:4px;font-family:monospace}
+.no-photo{display:flex;align-items:center;justify-content:center;height:100px;color:#5a6070;font-size:13px}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:bold}
 .badge-red{background:rgba(255,59,59,.15);color:#ff3b3b;border:1px solid rgba(255,59,59,.3)}
 .badge-green{background:rgba(0,208,132,.15);color:#00d084;border:1px solid rgba(0,208,132,.3)}
-/* TOAST */
+.msg-input{width:100%;background:#1a1d24;border:1px solid #2a2f3a;border-radius:8px;padding:10px;color:#fff;font-size:13px;margin-bottom:10px;resize:vertical;min-height:80px}
+.preview-box{background:#fff;border-radius:10px;padding:20px;text-align:center;color:#111;margin-top:10px}
+.preview-text{font-size:16px;font-weight:bold;line-height:1.6;white-space:pre-wrap}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1d24;border:1px solid #3d8bff;border-radius:10px;padding:12px 22px;font-size:13px;z-index:999;opacity:0;transition:all .3s;white-space:nowrap}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-select{background:#1a1d24;border:1px solid #2a2f3a;border-radius:8px;padding:10px;color:#fff;font-size:13px;width:100%;margin-bottom:10px}
 </style>
 </head>
 <body>
-
 <nav class="nav">
   <div class="logo">Phone<span>Guard</span> Pro</div>
   <div style="font-size:12px;display:flex;align-items:center;gap:6px">
@@ -72,23 +66,20 @@ select{background:#1a1d24;border:1px solid #2a2f3a;border-radius:8px;padding:10p
     <span id="srvStatus">Connexion...</span>
   </div>
 </nav>
-
 <div class="container">
 
-  <!-- APPAREIL -->
   <div class="card">
     <h3>Appareil</h3>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-      <span style="font-weight:bold;font-size:15px" id="devName">PHONE_001</span>
+      <span style="font-weight:bold;font-size:15px">PHONE_001</span>
       <span class="badge badge-green" id="devBadge">EN LIGNE</span>
     </div>
     <div style="font-size:11px;color:#8b91a0;font-family:monospace" id="lastSeen">—</div>
   </div>
 
-  <!-- STATS -->
   <div class="grid3">
     <div class="stat">
-      <div class="num" id="statLocked" style="color:#ff3b3b;font-size:16px">—</div>
+      <div class="num" id="statLocked" style="color:#ff3b3b;font-size:16px">NON</div>
       <div class="lbl">Bloqué</div>
     </div>
     <div class="stat">
@@ -96,38 +87,26 @@ select{background:#1a1d24;border:1px solid #2a2f3a;border-radius:8px;padding:10p
       <div class="lbl">Alertes</div>
     </div>
     <div class="stat">
-      <div class="num" id="statGps" style="color:#00d084;font-size:14px">—</div>
-      <div class="lbl">GPS</div>
+      <div class="num" id="statPhotos" style="color:#3d8bff">0</div>
+      <div class="lbl">Photos</div>
     </div>
   </div>
 
-  <!-- GPS CARTE -->
   <div class="card">
     <h3>Position GPS en temps réel</h3>
     <div class="gps-info">
-      <div class="gps-coords" id="coordsText">En attente du GPS...</div>
-      <div class="gps-meta" id="gpsAccuracy">Précision : —</div>
-      <div class="gps-meta" id="gpsMaj">Dernière mise à jour : —</div>
+      <div class="gps-coords" id="coordsText">En attente GPS...</div>
+      <div class="gps-meta" id="gpsMaj">—</div>
     </div>
-    <!-- Carte OpenStreetMap via iframe — GRATUIT, pas de clé API -->
     <iframe id="mapFrame"
-      src="https://www.openstreetmap.org/export/embed.html?bbox=47.4322%2C-19.0106%2C47.6322%2C-18.8106&layer=mapnik&marker=-18.9106%2C47.5322"
-      allowfullscreen>
+      src="https://www.openstreetmap.org/export/embed.html?bbox=47.4322%2C-19.0106%2C47.6322%2C-18.8106&layer=mapnik&marker=-18.9106%2C47.5322">
     </iframe>
     <div class="map-bar">
-      <a id="linkGoogleMaps" href="https://maps.google.com/?q=-18.9106,47.5322" target="_blank">
-        📍 Google Maps
-      </a>
-      <a id="linkWaze" href="https://waze.com/ul?ll=-18.9106,47.5322&navigate=yes" target="_blank">
-        🗺 Waze
-      </a>
-      <a id="linkStreet" href="https://www.google.com/maps?q=-18.9106,47.5322&layer=c" target="_blank">
-        🏙 Street View
-      </a>
+      <a id="linkGM" href="#" target="_blank">📍 Google Maps</a>
+      <a id="linkWaze" href="#" target="_blank">🗺 Waze</a>
     </div>
   </div>
 
-  <!-- COMMANDES -->
   <div class="card">
     <h3>Commandes à distance</h3>
     <div class="grid2">
@@ -138,7 +117,15 @@ select{background:#1a1d24;border:1px solid #2a2f3a;border-radius:8px;padding:10p
     </div>
   </div>
 
-  <!-- MESSAGE -->
+  <!-- PHOTOS DU VOLEUR -->
+  <div class="card">
+    <h3>Photos du voleur</h3>
+    <div id="photosList">
+      <div class="no-photo">Aucune photo reçue</div>
+    </div>
+    <button class="btn btn-gray" onclick="loadPhotos()" style="margin-top:8px">🔄 Actualiser les photos</button>
+  </div>
+
   <div class="card">
     <h3>Message écran bloqué</h3>
     <textarea class="msg-input" id="lockMsg">efa signale police
@@ -146,169 +133,145 @@ Raha tsy averinao ity telephone ity
 satria misy GPS
 
 atsoy 0341391434 tompony</textarea>
-    <button class="btn btn-gray" onclick="updateMsg()">💾 METTRE À JOUR LE MESSAGE</button>
+    <button class="btn btn-gray" onclick="updateMsg()">💾 Mettre à jour</button>
     <div class="preview-box">
-      <div class="preview-icon">🚨</div>
+      <div style="font-size:32px;margin-bottom:12px">🚨</div>
       <div class="preview-text" id="previewMsg">efa signale police</div>
-      <div class="preview-line"></div>
-      <div class="preview-sub">Ce telephone est signale vole</div>
     </div>
   </div>
 
-  <!-- ALERTES -->
   <div class="card">
     <h3>Alertes récentes</h3>
     <div id="eventsList">
-      <div style="color:#5a6070;font-size:13px;text-align:center;padding:20px">
-        En attente d'alertes...
-      </div>
+      <div style="color:#5a6070;font-size:13px;text-align:center;padding:20px">En attente...</div>
     </div>
   </div>
 
 </div>
-
 <div class="toast" id="toast"></div>
-
 <script>
-var DEVICE   = "PHONE_001";
-var SERVER   = window.location.origin;
-var curLat   = -18.9106;
-var curLng   = 47.5322;
+var DEVICE = "PHONE_001";
+var SERVER = window.location.origin;
+var curLat = -18.9106, curLng = 47.5322;
 var toastTmr = null;
-var online   = false;
 
-// Rafraichir toutes les 3 secondes
 setInterval(refreshAll, 3000);
 refreshAll();
+setInterval(loadPhotos, 15000);
 
 function refreshAll() {
     fetch(SERVER + '/api/status?device=' + DEVICE)
-        .then(function(r) { return r.json(); })
-        .then(function(dev) {
-            online = true;
-            renderDevice(dev);
-            document.getElementById('dotStatus').className = 'dot';
-            document.getElementById('srvStatus').textContent = 'Connecte';
-        })
-        .catch(function() {
-            online = false;
-            document.getElementById('dotStatus').className = 'dot off';
-            document.getElementById('srvStatus').textContent = 'Hors ligne';
-        });
+    .then(function(r){ return r.json(); })
+    .then(function(dev){
+        document.getElementById('dotStatus').className = 'dot';
+        document.getElementById('srvStatus').textContent = 'Connecte';
+        renderDevice(dev);
+    })
+    .catch(function(){
+        document.getElementById('dotStatus').className = 'dot off';
+        document.getElementById('srvStatus').textContent = 'Hors ligne';
+    });
 }
 
 function renderDevice(dev) {
-    // Badge statut
     var badge = document.getElementById('devBadge');
     var lkd   = document.getElementById('statLocked');
     if (dev.locked) {
-        badge.className   = 'badge badge-red';
+        badge.className = 'badge badge-red';
         badge.textContent = 'BLOQUE';
-        lkd.textContent   = 'OUI';
-        lkd.style.color   = '#ff3b3b';
+        lkd.textContent = 'OUI';
+        lkd.style.color = '#ff3b3b';
     } else {
-        badge.className   = 'badge badge-green';
+        badge.className = 'badge badge-green';
         badge.textContent = 'EN LIGNE';
-        lkd.textContent   = 'NON';
-        lkd.style.color   = '#00d084';
+        lkd.textContent = 'NON';
+        lkd.style.color = '#00d084';
     }
-
-    // Stats
-    document.getElementById('statEvents').textContent =
-        dev.events ? dev.events.length : 0;
-
-    // GPS — mettre a jour seulement si position change
-    if (dev.lat && dev.lng) {
-        var newLat = parseFloat(dev.lat);
-        var newLng = parseFloat(dev.lng);
-
-        if (newLat !== curLat || newLng !== curLng) {
-            curLat = newLat;
-            curLng = newLng;
-            updateMap(curLat, curLng);
-        }
-
-        var latStr = curLat.toFixed(6);
-        var lngStr = curLng.toFixed(6);
-        document.getElementById('coordsText').textContent =
-            latStr + ' , ' + lngStr;
-        document.getElementById('statGps').textContent = 'OK';
-
-        // Liens maps
-        document.getElementById('linkGoogleMaps').href =
-            'https://maps.google.com/?q=' + curLat + ',' + curLng;
-        document.getElementById('linkWaze').href =
-            'https://waze.com/ul?ll=' + curLat + ',' + curLng + '&navigate=yes';
-        document.getElementById('linkStreet').href =
-            'https://www.google.com/maps?q=' + curLat + ',' + curLng + '&layer=c';
-    }
-
-    // Derniere activite
+    document.getElementById('statEvents').textContent = dev.events ? dev.events.length : 0;
     if (dev.lastSeen) {
-        var d = new Date(dev.lastSeen);
         document.getElementById('lastSeen').textContent =
-            'Derniere activite : ' + d.toLocaleString('fr-FR');
+            'Derniere activite : ' + new Date(dev.lastSeen).toLocaleString('fr-FR');
         document.getElementById('gpsMaj').textContent =
-            'Derniere mise a jour : ' + d.toLocaleTimeString('fr-FR');
+            'MAJ : ' + new Date(dev.lastSeen).toLocaleTimeString('fr-FR');
     }
-
-    // Alertes
+    if (dev.lat && dev.lng) {
+        var la = parseFloat(dev.lat), lo = parseFloat(dev.lng);
+        if (la !== curLat || lo !== curLng) {
+            curLat = la; curLng = lo;
+            var d = 0.006;
+            var bbox = (lo-d)+'%2C'+(la-d)+'%2C'+(lo+d)+'%2C'+(la+d);
+            document.getElementById('mapFrame').src =
+                'https://www.openstreetmap.org/export/embed.html?bbox='+bbox+
+                '&layer=mapnik&marker='+la+'%2C'+lo;
+            document.getElementById('linkGM').href =
+                'https://maps.google.com/?q='+la+','+lo;
+            document.getElementById('linkWaze').href =
+                'https://waze.com/ul?ll='+la+','+lo+'&navigate=yes';
+        }
+        document.getElementById('coordsText').textContent =
+            la.toFixed(6) + ' , ' + lo.toFixed(6);
+    }
     if (dev.events && dev.events.length > 0) {
+        var icons = {locked:'🔒',unlocked:'🔓',auto_lock:'⚠️',
+                     photo_captured:'📸',alarm:'🔊',photo_request:'📷'};
         var html = '';
-        var icons = {
-            locked:         '🔒',
-            unlocked:       '🔓',
-            auto_lock:      '⚠️',
-            photo_captured: '📸',
-            alarm:          '🔊'
-        };
         for (var i = 0; i < Math.min(dev.events.length, 15); i++) {
-            var ev   = dev.events[i];
-            var type = ev.type || '';
-            var icon = icons[type] || '📡';
-            var t    = ev.time ? new Date(ev.time).toLocaleString('fr-FR') : '';
-            html += '<div class="event ' + type + '">' +
-                '<div class="event-type">' + icon + ' ' + type.toUpperCase() + '</div>' +
-                '<div class="event-msg">' + (ev.message || type) + '</div>' +
-                '<div class="event-time">' + t + '</div>' +
+            var ev = dev.events[i];
+            var t  = ev.type || '';
+            html += '<div class="event '+t+'">' +
+                '<div class="event-type">'+(icons[t]||'📡')+' '+t.toUpperCase()+'</div>' +
+                '<div class="event-msg">'+(ev.message||t)+'</div>' +
+                '<div class="event-time">'+(ev.time?new Date(ev.time).toLocaleString('fr-FR'):'')+'</div>' +
                 '</div>';
         }
         document.getElementById('eventsList').innerHTML = html;
     }
 }
 
-function updateMap(lat, lng) {
-    // OpenStreetMap iframe — affiche la position exacte
-    var delta = 0.008; // zoom
-    var bbox  = (lng - delta) + '%2C' + (lat - delta) + '%2C' +
-                (lng + delta) + '%2C' + (lat + delta);
-    var src   = 'https://www.openstreetmap.org/export/embed.html?' +
-                'bbox=' + bbox +
-                '&layer=mapnik' +
-                '&marker=' + lat + '%2C' + lng;
-    document.getElementById('mapFrame').src = src;
-    document.getElementById('gpsAccuracy').textContent =
-        'Position mise a jour — ' + lat.toFixed(6) + ', ' + lng.toFixed(6);
+function loadPhotos() {
+    fetch(SERVER + '/api/photos?device=' + DEVICE)
+    .then(function(r){ return r.json(); })
+    .then(function(list){
+        document.getElementById('statPhotos').textContent = list.length;
+        if (!list || list.length === 0) {
+            document.getElementById('photosList').innerHTML =
+                '<div class="no-photo">Aucune photo recue</div>';
+            return;
+        }
+        var html = '<div class="photo-grid">';
+        for (var i = 0; i < list.length; i++) {
+            var p = list[i];
+            var t = p.time ? new Date(p.time).toLocaleTimeString('fr-FR') : '';
+            html += '<div class="photo-item">' +
+                '<img src="data:image/jpeg;base64,'+p.data+'" />' +
+                '<div class="photo-time">'+t+'</div>' +
+                '</div>';
+        }
+        html += '</div>';
+        document.getElementById('photosList').innerHTML = html;
+    })
+    .catch(function(){});
 }
 
 function sendCmd(cmd) {
     var labels = {
-        lock:   '🔒 Commande BLOQUER envoyee !',
-        unlock: '🔓 Commande DEBLOQUER envoyee !',
-        alarm:  '🔊 ALARME envoyee !',
-        photo:  '📸 Demande PHOTO envoyee !'
+        lock:   '🔒 Telephone bloque !',
+        unlock: '🔓 Telephone debloque !',
+        alarm:  '🔊 Alarme sonnerie Max !',
+        photo:  '📸 Photo en cours...'
     };
     fetch(SERVER + '/api/command', {
         method:  'POST',
-        headers: {'Content-Type': 'application/json'},
-        body:    JSON.stringify({device: DEVICE, command: cmd})
+        headers: {'Content-Type':'application/json'},
+        body:    JSON.stringify({device:DEVICE, command:cmd})
     })
-    .then(function(r) { return r.json(); })
-    .then(function() {
+    .then(function(r){ return r.json(); })
+    .then(function(){
         showToast(labels[cmd] || 'Commande envoyee');
         setTimeout(refreshAll, 2000);
+        if (cmd === 'photo') setTimeout(loadPhotos, 8000);
     })
-    .catch(function() { showToast('Erreur : serveur non accessible'); });
+    .catch(function(){ showToast('Erreur connexion'); });
 }
 
 function updateMsg() {
@@ -316,10 +279,9 @@ function updateMsg() {
     document.getElementById('previewMsg').textContent = msg;
     fetch(SERVER + '/api/command', {
         method:  'POST',
-        headers: {'Content-Type': 'application/json'},
-        body:    JSON.stringify({device: DEVICE, command: 'message', message: msg})
-    })
-    .then(function() { showToast('Message mis a jour sur le telephone !'); });
+        headers: {'Content-Type':'application/json'},
+        body:    JSON.stringify({device:DEVICE, command:'message', message:msg})
+    }).then(function(){ showToast('Message mis a jour !'); });
 }
 
 document.getElementById('lockMsg').addEventListener('input', function() {
@@ -331,7 +293,7 @@ function showToast(msg) {
     t.textContent = msg;
     t.classList.add('show');
     clearTimeout(toastTmr);
-    toastTmr = setTimeout(function() { t.classList.remove('show'); }, 3500);
+    toastTmr = setTimeout(function(){ t.classList.remove('show'); }, 3500);
 }
 </script>
 </body>
