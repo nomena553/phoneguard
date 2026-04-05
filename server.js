@@ -5,8 +5,10 @@ const url  = require('url');
 
 const PORT = process.env.PORT || 3000;
 
-// Base de donnees en memoire
+// Base de donnees
 const db = {};
+// Stocker les photos separement
+const photos = {};
 
 function getDevice(id) {
     if (!db[id]) {
@@ -36,7 +38,7 @@ const server = http.createServer(function(req, res) {
         res.writeHead(200); res.end(); return;
     }
 
-    // GET /api/commands?device=ID
+    // GET /api/commands
     if (req.method === 'GET' && route === '/api/commands') {
         var dev = getDevice(query.device || 'unknown');
         var cmd = dev.command || "";
@@ -83,6 +85,42 @@ const server = http.createServer(function(req, res) {
         return;
     }
 
+    // POST /api/photo — recevoir photo en base64
+    if (req.method === 'POST' && route === '/api/photo') {
+        readBody(req, function(body) {
+            try {
+                var data = JSON.parse(body);
+                var devId = data.device || 'unknown';
+                var dev  = getDevice(devId);
+                // Stocker la photo
+                if (!photos[devId]) photos[devId] = [];
+                photos[devId].unshift({
+                    data: data.photo,
+                    time: new Date().toISOString()
+                });
+                // Garder seulement 10 photos
+                if (photos[devId].length > 10) photos[devId].pop();
+                // Ajouter evenement
+                dev.events.unshift({
+                    type:    'photo_captured',
+                    message: 'Photo du voleur recue',
+                    time:    new Date().toISOString()
+                });
+                dev.lastSeen = new Date().toISOString();
+            } catch(e) {}
+            res.writeHead(200); res.end('OK');
+        });
+        return;
+    }
+
+    // GET /api/photos?device=ID — recuperer les photos
+    if (req.method === 'GET' && route === '/api/photos') {
+        var devPhotos = photos[query.device] || [];
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify(devPhotos));
+        return;
+    }
+
     // POST /api/command
     if (req.method === 'POST' && route === '/api/command') {
         readBody(req, function(body) {
@@ -90,8 +128,8 @@ const server = http.createServer(function(req, res) {
                 var data = JSON.parse(body);
                 var dev  = getDevice(data.device || 'unknown');
                 dev.command = data.command;
-                if (data.command === 'lock')    dev.locked = true;
-                if (data.command === 'unlock')  dev.locked = false;
+                if (data.command === 'lock')   dev.locked = true;
+                if (data.command === 'unlock') dev.locked = false;
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.end(JSON.stringify({ok: true}));
             } catch(e) {
@@ -101,7 +139,7 @@ const server = http.createServer(function(req, res) {
         return;
     }
 
-    // GET /api/status?device=ID
+    // GET /api/status
     if (req.method === 'GET' && route === '/api/status') {
         var dev = getDevice(query.device || 'unknown');
         res.writeHead(200, {'Content-Type': 'application/json'});
@@ -116,7 +154,7 @@ const server = http.createServer(function(req, res) {
         return;
     }
 
-    // Tableau de bord HTML
+    // Dashboard HTML
     var htmlFile = path.join(__dirname, 'dashboard.html');
     if (fs.existsSync(htmlFile)) {
         res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
