@@ -36,7 +36,48 @@ const server = http.createServer(function(req, res) {
         res.writeHead(200); res.end(); return;
     }
 
-    // GET /api/commands
+    // ============================================================
+    // PAGE PRIVEE PAR TELEPHONE
+    // /phone/PHONE_001 → interface seulement pour PHONE_001
+    // ============================================================
+    if (req.method === 'GET' && route.startsWith('/phone/')) {
+        var deviceId = route.replace('/phone/', '').trim();
+        if (!deviceId) {
+            res.writeHead(404); res.end('ID manquant'); return;
+        }
+        var htmlFile = path.join(__dirname, 'device.html');
+        if (fs.existsSync(htmlFile)) {
+            var html = fs.readFileSync(htmlFile, 'utf8');
+            // Injecter l'ID du telephone dans la page
+            html = html.replace('__DEVICE_ID__', deviceId);
+            res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
+            res.end(html);
+        } else {
+            res.writeHead(404); res.end('device.html manquant');
+        }
+        return;
+    }
+
+    // ============================================================
+    // PAGE ADMIN — voir tous les telephones
+    // /admin → dashboard complet
+    // ============================================================
+    if (req.method === 'GET' && route === '/admin') {
+        var htmlFile2 = path.join(__dirname, 'dashboard.html');
+        if (fs.existsSync(htmlFile2)) {
+            res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
+            res.end(fs.readFileSync(htmlFile2));
+        } else {
+            res.writeHead(404); res.end('dashboard.html manquant');
+        }
+        return;
+    }
+
+    // ============================================================
+    // API ENDPOINTS
+    // ============================================================
+
+    // GET /api/commands?device=ID
     if (req.method === 'GET' && route === '/api/commands') {
         var dev = getDevice(query.device || 'unknown');
         var cmd = dev.command || "";
@@ -53,9 +94,8 @@ const server = http.createServer(function(req, res) {
             try {
                 var data = JSON.parse(body);
                 var dev  = getDevice(data.device || 'unknown');
-                // Accepter seulement si position valide (pas 0,0)
-                var la = parseFloat(data.lat);
-                var lo = parseFloat(data.lng);
+                var la   = parseFloat(data.lat);
+                var lo   = parseFloat(data.lng);
                 if (!isNaN(la) && !isNaN(lo) && la !== 0 && lo !== 0) {
                     dev.lat = la;
                     dev.lng = lo;
@@ -73,9 +113,8 @@ const server = http.createServer(function(req, res) {
             try {
                 var data = JSON.parse(body);
                 var dev  = getDevice(data.device || 'unknown');
-                // Mettre a jour GPS si recu avec evenement
-                var la = parseFloat(data.lat);
-                var lo = parseFloat(data.lng);
+                var la   = parseFloat(data.lat);
+                var lo   = parseFloat(data.lng);
                 if (!isNaN(la) && !isNaN(lo) && la !== 0 && lo !== 0) {
                     dev.lat = la;
                     dev.lng = lo;
@@ -120,7 +159,7 @@ const server = http.createServer(function(req, res) {
         return;
     }
 
-    // GET /api/photos
+    // GET /api/photos?device=ID
     if (req.method === 'GET' && route === '/api/photos') {
         var devPhotos = photos[query.device] || [];
         res.writeHead(200, {'Content-Type': 'application/json'});
@@ -146,7 +185,7 @@ const server = http.createServer(function(req, res) {
         return;
     }
 
-    // GET /api/status
+    // GET /api/status?device=ID
     if (req.method === 'GET' && route === '/api/status') {
         var dev = getDevice(query.device || 'unknown');
         res.writeHead(200, {'Content-Type': 'application/json'});
@@ -154,18 +193,18 @@ const server = http.createServer(function(req, res) {
         return;
     }
 
-    // GET /api/devices
+    // GET /api/devices — liste tous les telephones
     if (req.method === 'GET' && route === '/api/devices') {
         res.writeHead(200, {'Content-Type': 'application/json'});
         res.end(JSON.stringify(Object.values(db)));
         return;
     }
 
-    // Dashboard HTML
-    var htmlFile = path.join(__dirname, 'dashboard.html');
-    if (fs.existsSync(htmlFile)) {
+    // Page principale → rediriger vers admin
+    var mainHtml = path.join(__dirname, 'dashboard.html');
+    if (fs.existsSync(mainHtml)) {
         res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
-        res.end(fs.readFileSync(htmlFile));
+        res.end(fs.readFileSync(mainHtml));
     } else {
         res.writeHead(200, {'Content-Type': 'text/html'});
         res.end('<h1>PhoneGuard actif</h1>');
