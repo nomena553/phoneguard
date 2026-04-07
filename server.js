@@ -8,8 +8,8 @@ const PORT = process.env.PORT || 3000;
 // ============================================================
 // MOTS DE PASSE â€” CHANGEZ CES VALEURS !
 // ============================================================
-const ADMIN_PASSWORD  = "Nomenamino261admin";  // Mot de passe page /admin
-const DEVICE_PASSWORD = "Client261";       // Mot de passe page /phone/ID
+const ADMIN_PASSWORD  = "nomena2024admin";  // Mot de passe page /admin
+const DEVICE_PASSWORD = "nomena2024";       // Mot de passe page /phone/ID
 
 // ============================================================
 // BASE DE DONNEES
