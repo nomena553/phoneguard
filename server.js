@@ -5,19 +5,8 @@ const url  = require('url');
 
 const PORT = process.env.PORT || 3000;
 
-// ============================================================
-// MOTS DE PASSE â€” CHANGEZ CES VALEURS !
-// ============================================================
-const ADMIN_PASSWORD  = "nomena2024admin";  // Mot de passe page /admin
-const DEVICE_PASSWORD = "nomena2024";       // Mot de passe page /phone/ID
-
-// ============================================================
-// BASE DE DONNEES
-// ============================================================
 const db     = {};
 const photos = {};
-// Sessions connectees (token => {deviceId, time})
-const sessions = {};
 
 function getDevice(id) {
     if (!db[id]) {
@@ -34,37 +23,10 @@ function getDevice(id) {
     return db[id];
 }
 
-// Generer token de session
-function makeToken() {
-    return Math.random().toString(36).substring(2) +
-           Math.random().toString(36).substring(2);
-}
-
-// Verifier si session valide
-function checkSession(cookieHeader, deviceId) {
-    if (!cookieHeader) return false;
-    var cookies = cookieHeader.split(';');
-    for (var i = 0; i < cookies.length; i++) {
-        var parts = cookies[i].trim().split('=');
-        if (parts[0] === 'pgtoken') {
-            var token = parts[1];
-            var sess  = sessions[token];
-            if (sess) {
-                // Admin peut voir tout
-                if (sess.deviceId === 'admin') return true;
-                // Session specifique au telephone
-                if (sess.deviceId === deviceId) return true;
-            }
-        }
-    }
-    return false;
-}
-
 const server = http.createServer(function(req, res) {
-    const parsed  = url.parse(req.url, true);
-    const route   = parsed.pathname;
-    const query   = parsed.query;
-    const cookies = req.headers.cookie || '';
+    const parsed = url.parse(req.url, true);
+    const route  = parsed.pathname;
+    const query  = parsed.query;
 
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -73,114 +35,6 @@ const server = http.createServer(function(req, res) {
     if (req.method === 'OPTIONS') {
         res.writeHead(200); res.end(); return;
     }
-
-    // ============================================================
-    // LOGIN PAGE â€” /login?for=admin ou /login?for=PHONE_001
-    // ============================================================
-    if (req.method === 'GET' && route === '/login') {
-        var forId = query.for || 'admin';
-        res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
-        res.end(loginPage(forId));
-        return;
-    }
-
-    // ============================================================
-    // LOGIN POST â€” verifier mot de passe
-    // ============================================================
-    if (req.method === 'POST' && route === '/login') {
-        readBody(req, function(body) {
-            try {
-                var data     = JSON.parse(body);
-                var password = data.password || '';
-                var forId    = data.for || 'admin';
-                var ok       = false;
-
-                if (forId === 'admin' && password === ADMIN_PASSWORD) {
-                    ok = true;
-                } else if (forId !== 'admin' && password === DEVICE_PASSWORD) {
-                    ok = true;
-                }
-
-                if (ok) {
-                    var token = makeToken();
-                    sessions[token] = {
-                        deviceId: forId,
-                        time:     Date.now()
-                    };
-                    res.writeHead(200, {
-                        'Content-Type': 'application/json',
-                        'Set-Cookie': 'pgtoken=' + token +
-                            '; Path=/; Max-Age=86400; HttpOnly'
-                    });
-                    res.end(JSON.stringify({ok: true, for: forId}));
-                } else {
-                    res.writeHead(200, {'Content-Type': 'application/json'});
-                    res.end(JSON.stringify({ok: false}));
-                }
-            } catch(e) {
-                res.writeHead(500); res.end('{}');
-            }
-        });
-        return;
-    }
-
-    // ============================================================
-    // PAGE ADMIN â€” protegee par mot de passe
-    // ============================================================
-    if (req.method === 'GET' && route === '/admin') {
-        if (!checkSession(cookies, 'admin')) {
-            res.writeHead(302, {'Location': '/login?for=admin'});
-            res.end(); return;
-        }
-        var f = path.join(__dirname, 'dashboard.html');
-        if (fs.existsSync(f)) {
-            res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
-            res.end(fs.readFileSync(f));
-        } else {
-            res.writeHead(404); res.end('dashboard.html manquant');
-        }
-        return;
-    }
-
-    // ============================================================
-    // PAGE TELEPHONE â€” protegee par mot de passe
-    // ============================================================
-    if (req.method === 'GET' && route.startsWith('/phone/')) {
-        var deviceId = route.replace('/phone/', '').trim();
-        if (!deviceId) {
-            res.writeHead(404); res.end('ID manquant'); return;
-        }
-        // Verifier session
-        if (!checkSession(cookies, deviceId)) {
-            res.writeHead(302, {'Location': '/login?for=' + deviceId});
-            res.end(); return;
-        }
-        var f2 = path.join(__dirname, 'device.html');
-        if (fs.existsSync(f2)) {
-            var html = fs.readFileSync(f2, 'utf8');
-            html = html.replace(/__DEVICE_ID__/g, deviceId);
-            res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
-            res.end(html);
-        } else {
-            res.writeHead(404); res.end('device.html manquant');
-        }
-        return;
-    }
-
-    // ============================================================
-    // LOGOUT
-    // ============================================================
-    if (req.method === 'GET' && route === '/logout') {
-        res.writeHead(302, {
-            'Location': '/',
-            'Set-Cookie': 'pgtoken=; Path=/; Max-Age=0'
-        });
-        res.end(); return;
-    }
-
-    // ============================================================
-    // API â€” pas de protection (appelee par l'app Android)
-    // ============================================================
 
     // GET /api/commands
     if (req.method === 'GET' && route === '/api/commands') {
@@ -305,79 +159,16 @@ const server = http.createServer(function(req, res) {
         return;
     }
 
-    // Page principale â†’ rediriger vers login admin
-    res.writeHead(302, {'Location': '/admin'});
-    res.end();
+    // Dashboard HTML
+    var htmlFile = path.join(__dirname, 'dashboard.html');
+    if (fs.existsSync(htmlFile)) {
+        res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
+        res.end(fs.readFileSync(htmlFile));
+    } else {
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        res.end('<h1>PhoneGuard actif</h1>');
+    }
 });
-
-// ============================================================
-// PAGE LOGIN
-// ============================================================
-function loginPage(forId) {
-    var title = forId === 'admin' ? 'Admin' : forId;
-    return '<!DOCTYPE html><html lang="fr"><head>' +
-    '<meta charset="UTF-8">' +
-    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
-    '<title>PhoneGuard â€” Connexion</title>' +
-    '<style>' +
-    '*{margin:0;padding:0;box-sizing:border-box}' +
-    'body{font-family:Arial,sans-serif;background:#0a0c10;' +
-    'display:flex;align-items:center;justify-content:center;' +
-    'min-height:100vh;padding:20px}' +
-    '.box{background:#111318;border:1px solid #2a2f3a;border-radius:16px;' +
-    'padding:32px 28px;width:100%;max-width:360px;text-align:center}' +
-    '.logo{font-size:22px;font-weight:bold;color:#fff;margin-bottom:6px}' +
-    '.logo span{color:#ff3b3b}' +
-    '.sub{font-size:13px;color:#8b91a0;margin-bottom:28px}' +
-    '.device-badge{background:#1a1d24;border:1px solid #3d8bff;' +
-    'border-radius:8px;padding:8px 16px;font-family:monospace;' +
-    'font-size:13px;color:#3d8bff;display:inline-block;margin-bottom:24px}' +
-    'input{width:100%;background:#1a1d24;border:1px solid #2a2f3a;' +
-    'border-radius:10px;padding:14px;color:#fff;font-size:15px;' +
-    'margin-bottom:16px;text-align:center;letter-spacing:2px}' +
-    'input:focus{outline:none;border-color:#3d8bff}' +
-    'button{width:100%;background:#ff3b3b;color:#fff;border:none;' +
-    'border-radius:10px;padding:14px;font-size:15px;font-weight:bold;' +
-    'cursor:pointer;transition:opacity .2s}' +
-    'button:hover{opacity:.85}' +
-    '.err{color:#ff3b3b;font-size:13px;margin-top:12px;display:none}' +
-    '.loading{color:#8b91a0;font-size:13px;margin-top:12px;display:none}' +
-    '</style></head><body>' +
-    '<div class="box">' +
-    '<div class="logo">Phone<span>Guard</span></div>' +
-    '<div class="sub">by Nomena</div>' +
-    '<div class="device-badge">' + title + '</div>' +
-    '<input type="password" id="pwd" placeholder="Mot de passe" ' +
-    'onkeydown="if(event.key===\'Enter\')doLogin()" autofocus />' +
-    '<button onclick="doLogin()">CONNEXION</button>' +
-    '<div class="err" id="err">Mot de passe incorrect</div>' +
-    '<div class="loading" id="load">Connexion...</div>' +
-    '</div>' +
-    '<script>' +
-    'function doLogin(){' +
-    'var pwd=document.getElementById("pwd").value;' +
-    'if(!pwd){document.getElementById("err").style.display="block";return;}' +
-    'document.getElementById("err").style.display="none";' +
-    'document.getElementById("load").style.display="block";' +
-    'fetch("/login",{method:"POST",' +
-    'headers:{"Content-Type":"application/json"},' +
-    'body:JSON.stringify({password:pwd,for:"' + forId + '"})})' +
-    '.then(function(r){return r.json();})' +
-    '.then(function(d){' +
-    'if(d.ok){' +
-    'if(d.for==="admin"){window.location="/admin";}' +
-    'else{window.location="/phone/"+d.for;}' +
-    '}else{' +
-    'document.getElementById("load").style.display="none";' +
-    'document.getElementById("err").style.display="block";' +
-    'document.getElementById("pwd").value="";' +
-    '}})' +
-    '.catch(function(){' +
-    'document.getElementById("load").style.display="none";' +
-    'document.getElementById("err").style.display="block";' +
-    '});}' +
-    '</script></body></html>';
-}
 
 function readBody(req, callback) {
     var body = '';
